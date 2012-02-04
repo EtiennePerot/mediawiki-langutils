@@ -134,7 +134,10 @@ class ExtLangUtils {
 		# Use regular expression if page is a file
 		if ( $namespace == NS_FILE ) {
 			
-			$end = end( explode( ' ', $title ) );
+			# Needed to do this to overcome issue:
+			# "Only variables can be passed by reference"
+			$fparts = explode( ' ', $title );
+			$end = end( $fparts );
 
 			$m = preg_match( '/\.?(.+?)\..+?$/', $end, $match );
 			if ( $m ) {
