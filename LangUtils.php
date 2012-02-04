@@ -187,30 +187,56 @@ class ExtLangUtils {
 		return true;
 	}
 
+	# Double functionality: returns magic word values, and parser function values.
+	# In default set, {{FULLPAGENAME}} is a magic word, whereas {{FULLPAGENAME:Page}}
+	# is a parser function. This aims to achieve the same end similarly.
 	public static function getVariableValue( &$parser, &$cache, &$magicWordId, &$ret ) {
 		ExtLangUtils::setLang( $parser );
 		switch ( $magicWordId ) {
 			case 'pagelang':
-				# Simply return the page language as a magic word variable.
-				$ret = $parser->getTitle()->mPageLang;
+				$ret = ExtLangUtils::pagelang( $parser );
 				break;
 			case 'pagelangsuffix':
-				# Returns '' for en pages and '/xx' for language pages. Replacement
-				# of {{if lang}} templates. More advanced needs can use {{#ifpagelang:}}
-				# instead, as it has '$1' replacement features.
-				$lang = $parser->getTitle()->mPageLang;
-				if ( $lang == 'en' ) {
-					$ret = '';
-				}
-				else {
-					$ret = '/' . $lang;
-				}
+				$ret = ExtLangUtils::pagelangsuffix( $parser );
 				break;
 			default:
 				$ret = '';
 				break;
 		}
 		return true;
+	}
+
+	# Simply return the page language.
+	# If it is set already, reuse. If not, regrab from title.
+	public static function pagelang( $parser, $custom = null ) {
+		if ( is_null( $custom ) ) {
+			ExtLangUtils::setLang( $parser );
+			return $parser->getTitle()->mPageLang;
+		}
+		else {
+			$c = Title::newFromText( $custom );
+			return ExtLangUtils::getLang( $c );
+		}
+	}
+
+	# Returns '' for en pages and '/xx' for language pages.
+	# Replacement for {{if lang}} templates.
+	public static function pagelangsuffix( $parser, $custom = null ) {
+		if ( is_null( $custom ) ) {
+			ExtLangUtils::setLang( $parser );
+			$lang = $parser->getTitle()->mPageLang;
+		}
+		else {
+			$c = Title::newFromText( $custom );
+			$lang = ExtLangUtils::getLang( $c );
+		}
+
+		if ( $lang == 'en' ) {
+			return '';
+		}
+		else {
+			return '/' . $lang;
+		}
 	}
 	
 	##
