@@ -363,6 +363,10 @@ class ExtLangUtils {
 
 			}
 
+			# Save the page language for the <body> function, or other skin
+			# functions that may need it later.
+			$skin->sPageLang = $pageLang;
+
 			# Start building the list of links.
 			$output = '<ul>';
 			$output .= "<li id=\"n-en\"><a href=\"$enURL\">English</a></li>";
@@ -392,13 +396,17 @@ class ExtLangUtils {
 		return true;
 
 	}
-
 	public static function skinAddBodyClass( $out, $skin, &$bodyAttrs ) {
 
-		$pageLang = ExtLangUtils::getLang( $out->mPagetitle, $out->getTitle()->mNamespace );
+		if ( isset( $skin->sPageLang ) ) {
+			$pageLang = $skin->sPageLang;
+		}
+		else {
+			$pageLang = ExtLangUtils::getLang( $out->mPagetitle, $out->getTitle()->mNamespace );
+			$skin->sPageLang = $pageLang;
+		}
 		$bodyAttrs['class'] .= ' pagelang-' . $pageLang;
 
 		return true;
 	}
-
 }
