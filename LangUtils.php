@@ -58,6 +58,7 @@ $wgLangUtils_SidebarList = true;
 		NS_FILE
 	);
 $wgLangUtils_PageClass = true;
+$wgLangUtils_ChangeAnonLang = true;
 
 # Setup
 
@@ -69,6 +70,7 @@ function wfLangUtilsSetup() {
 		$wgLangUtils_LangSwitch,
 		$wgLangUtils_SidebarList,
 		$wgLangUtils_PageClass,
+		$wgLangUtils_ChangeAnonLang,
 
 		$wgHooks,
 		$wgAllowedLanguages;
@@ -83,14 +85,15 @@ function wfLangUtilsSetup() {
 			$wgHooks['LanguageGetMagic'][] = 'wfLangUtils_LanguageGetMagic';
 			$wgHooks['ParserGetVariableValueSwitch'][] = 'ExtLangUtils::getVariableValue';
 		}
-
 		if ( $wgLangUtils_SidebarList ) {
 			$wgHooks['SkinBuildSidebar'][] = 'ExtLangUtils::skinAddSidebar';
 		}
 		if ( $wgLangUtils_PageClass ) {
 			$wgHooks['OutputPageBodyAttributes'][] = 'ExtLangUtils::skinAddBodyClass';
 		}
-
+		if ( $wgLangUtils_ChangeAnonLang ) {
+			$wgHooks['PageContentLanguage'][] = 'ExtLangUtils::changePageLang';
+		}
 	}
 
 	return true;
@@ -179,8 +182,13 @@ class ExtLangUtils {
 		}
 	}
 	
-	public static function setLang( &$parser ) {
-		$title = $parser->getTitle();
+	public static function setLang( &$parserOrTitle, $isTitle = false ) {
+		if ( $isTitle ) {
+			$title = $parserOrTitle;
+		}
+		else {
+			$title = $parserOrTitle->getTitle();
+		}
 		if ( !isset( $title->mPageLang ) ) {
 			$title->mPageLang = ExtLangUtils::getLang( $title->mTextform, $title->mNamespace );
 		}
@@ -314,6 +322,19 @@ class ExtLangUtils {
 			return '';
 		}
 
+	}
+
+	## Change language to mPageLang if the user is anonymous.
+	public static function changePageLang( $title, &$pageLang, $wgLang ) {
+		global $wgUser;
+		ExtLangUtils::setLang( $title, true );
+		if ( $wgUser->isAnon() ) {
+			$lang = $title->mPageLang;
+			if ( $lang !== 'en' ) {
+				$pageLang->setCode( $lang );
+			}
+		}
+		return true;
 	}
 
 	##

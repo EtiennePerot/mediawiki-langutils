@@ -13,7 +13,7 @@ LangUtils
 * SidebarList &ndash; 1.14.0+ &ndash; adds a list of all existing translations to the navigation links (replaces manual solutions like {{languages}})
     * SidebarList also provides links for file pages (for `File:Test.png`, it will link to `File:Test fr.png`, `File:Test de.png`, etc).
 * PageClass &ndash; 1.17.0+ &ndash; adds `pagelang-xx` class to the `<body>` tag to allow language-specific CSS
-
+* ChangeAnonLang &ndash; 1.18.0+ &ndash; if there is no user logged in (anonymous), change the language of the site interface to match the page language. For example, on `Page/de`, anonymous users will see the site interface in German as well as the page content. Users who are logged are unaffected, and continue to see the appropriate language specified in Preferences.
 ### Installation
 
 The following code should be added to `LocalSettings.php`:
@@ -22,11 +22,12 @@ The following code should be added to `LocalSettings.php`:
 
 Optional variables:
 
+* `$wgAllowedLanguages` &ndash; array of strings containing all supported language codes
 * `$wgLangUtils_LangSwitch` &ndash; set to false to disable {{#langswitch:}}
 * `$wgLangUtils_SidebarList` &ndash; set to false to disable the sidebar list
     * `$wgLangUtils_SidebarList_NS` &ndash; whitelist of namespaces to display the sidebar listing on (give as array of namespace constants, e.g. `NS_MAIN`)
 * `$wgLangUtils_PageClass` &ndash; set to false to disable language CSS class (**Note**: this must be disabled on installations lower than 1.17.0).
-* `$wgAllowedLanguages` &ndash; array of strings containing all supported language codes
+* `$wgLangUtils_ChangeAnonLang` &ndash; set to false to disable page interface language matching page language for anonymous users.
 
 ### Development
 
@@ -38,6 +39,12 @@ Optional variables:
 #### TODO
 
 * Test on older versions.
+* [WindPower](https://github.com/EtiennePerot) suggestions:
+     * Logo link modification
+          * Solved by changing "MediaWiki:Mainpage/fr" to "Main Page/fr". Investigate into whether overwriting MW interface strings worth it.
+     * Customize link format (e.g. default "Title/lang", allow for "lang:Title" or other formats)
+     * Modify link to Special:RandomPage so as to allow proper 'random' pages in languages
+     * (done) Change site interface language depending on the page language for anonymous users
 
 ### Licensing
 
