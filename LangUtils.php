@@ -494,6 +494,7 @@ function wfLangUtilsSetup() {
 }
 
 function wfLangUtils_ParserFirstCallInit( $parser ) {
+	$parser->setFunctionHook( 'languagetitle', 'ExtLangUtils::languagetitle', SFH_OBJECT_ARGS );
 	$parser->setFunctionHook( 'langswitch', 'ExtLangUtils::langswitch', SFH_OBJECT_ARGS );
 	$parser->setFunctionHook( 'ifpagelang', 'ExtLangUtils::ifpagelang', SFH_OBJECT_ARGS );
 
@@ -504,6 +505,7 @@ function wfLangUtils_ParserFirstCallInit( $parser ) {
 }
 
 function wfLangUtils_LanguageGetMagic( &$magicWords, $langCode ) {
+	$magicWords['languagetitle'] = array( 0, 'languagetitle' );
 	$magicWords['langswitch'] = array( 0, 'langswitch' );
 	$magicWords['ifpagelang'] = array( 0, 'ifpagelang' );
 	$magicWords['pagelang'] = array( 0, 'pagelang' );
@@ -668,6 +670,14 @@ class ExtLangUtils {
 			return str_replace( '$1', $lang, trim( $frame->expand( $false ) ) ); # Expand the 'False' field.
 		}
 
+	}
+
+	public static function languagetitle( $parser, $frame, $args ) {
+		global $coreLanguageNames_titlecase;
+		if ( count( $args ) == 0 || !isset($coreLanguageNames_titlecase[$args[0]]) ) {
+			return '';
+		}
+		return $coreLanguageNames_titlecase[$args[0]];
 	}
 
 	public static function langswitch( $parser, $frame, $args ) {
