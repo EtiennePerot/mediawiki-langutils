@@ -58,7 +58,7 @@ $wgLangUtils_SidebarList = true;
 		NS_FILE
 	);
 $wgLangUtils_PageClass = true;
-$wgLangUtils_ChangeAnonLang = true;
+$wgLangUtils_ChangeAnonLang = false;
 
 # Copied straight from https://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/languages/Names.php?revision=113600
 # Further versions have sometimes-lowercase language names, and ucwords() only works on ASCII characters.
