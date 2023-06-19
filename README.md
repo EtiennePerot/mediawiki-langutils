@@ -18,22 +18,13 @@ LangUtils
 
 The following code should be added to `LocalSettings.php`:
 
-    require_once( "$IP/extensions/LangUtils/LangUtils.php" );
-
-Optional variables:
-
-* `$wgAllowedLanguages` &ndash; array of strings containing all supported language codes
-* `$wgLangUtils_LangSwitch` &ndash; set to false to disable {{#langswitch:}}
-* `$wgLangUtils_SidebarList` &ndash; set to false to disable the sidebar list
-    * `$wgLangUtils_SidebarList_NS` &ndash; whitelist of namespaces to display the sidebar listing on (give as array of namespace constants, e.g. `NS_MAIN`)
-* `$wgLangUtils_PageClass` &ndash; set to false to disable language CSS class (**Note**: this must be disabled on installations lower than 1.17.0).
-* `$wgLangUtils_ChangeAnonLang` &ndash; set to false to disable page interface language matching page language for anonymous users.
+    wfLoadExtension('LangUtils');
 
 ### Development
 
 #### Testing
 
-* Developed for, and tested on MediaWiki stable branch (currently **1.18.1**).
+* Developed for, and tested on MediaWiki stable branch (currently **1.39.3**).
 * Untested on 1.18.0 or lower.
 
 #### TODO

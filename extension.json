@@ -1,0 +1,35 @@
+{
+    "name": "LangUtils",
+    "author": [
+        "seb26",
+        "WindPower"
+    ],
+    "url": "https://github.com/ThePortalWiki/LangUtils",
+    "descriptionmsg": "langutils-desc",
+    "version": "1.0.0",
+    "license-name": "Apache-2.0",
+    "type": "other",
+    "requires": {
+        "MediaWiki": ">= 1.27.0"
+    },
+    "Hooks": {
+        "ParserFirstCallInit": "ExtLangUtils::onParserFirstCallInit",
+        "ParserGetVariableValueSwitch": "ExtLangUtils::getVariableValue",
+        "GetMagicVariableIDs": "ExtLangUtils::MagicWordwgVariableIDs",
+        "SkinBuildSidebar": "ExtLangUtils::skinAddSidebar",
+        "OutputPageBodyAttributes": "ExtLangUtils::skinAddBodyClass",
+        "PageContentLanguage": "ExtLangUtils::changePageLang"
+    },
+    "AutoloadClasses": {
+        "ExtLangUtils": "LangUtils.php"
+    },
+    "MessagesDirs": {
+        "LangUtils": [
+            "i18n"
+        ]
+    },
+    "ExtensionMessagesFiles": {
+        "LangUtilsMagic": "LangUtils.i18n.php"
+    },
+    "manifest_version": 2
+}
