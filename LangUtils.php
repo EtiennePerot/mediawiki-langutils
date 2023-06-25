@@ -436,6 +436,13 @@ class ExtLangUtils {
 		NS_MAIN,
 		NS_FILE
 	);
+	public static $langMap = null;
+
+	public static function initLangMap() {
+		if (is_null(ExtLangUtils::$langMap)) {
+			ExtLangUtils::$langMap = new WeakMap();
+		}
+	}
 
 	public static function onParserFirstCallInit( Parser $parser ) {
 		$parser->setFunctionHook( 'languagetitle', [ self::class, 'languagetitle' ], SFH_OBJECT_ARGS );
@@ -454,8 +461,9 @@ class ExtLangUtils {
 		return true;
 	}
 
-	# For obtaining the page language from a title string, preferably given from Title->mTextform.
+	# For obtaining the page language from a title string.
 	public static function getLang( $title, $namespace = false, $returnMatch = false ) {
+		ExtLangUtils::initLangMap();
 		if ( $title == null || $title == '' ) {
 			return '';
 		}
@@ -515,8 +523,9 @@ class ExtLangUtils {
 		else {
 			$title = $parserOrTitle->getTitle();
 		}
-		if ( !isset( $title->langUtilsPageLang ) ) {
-			$title->langUtilsPageLang = ExtLangUtils::getLang( $title->getText(), $title->getNamespace() );
+		ExtLangUtils::initLangMap();
+		if ( empty( ExtLangUtils::$langMap[$title] ) ) {
+			ExtLangUtils::$langMap[$title] = ExtLangUtils::getLang( $title->getText(), $title->getNamespace() );
 		}
 		return true;
 	}
@@ -545,7 +554,7 @@ class ExtLangUtils {
 	public static function pagelang( $parser, $custom = null ) {
 		if ( is_null( $custom ) ) {
 			ExtLangUtils::setLang( $parser );
-			return $parser->getTitle()->langUtilsPageLang;
+			return ExtLangUtils::$langMap[$parser->getTitle()];
 		}
 		else {
 			$c = Title::newFromText( $custom );
@@ -558,7 +567,7 @@ class ExtLangUtils {
 	public static function pagelangsuffix( $parser, $custom = null ) {
 		if ( is_null( $custom ) ) {
 			ExtLangUtils::setLang( $parser );
-			$lang = $parser->getTitle()->langUtilsPageLang;
+			$lang = ExtLangUtils::$langMap[$parser->getTitle()];
 		}
 		else {
 			$c = Title::newFromText( $custom );
@@ -589,7 +598,7 @@ class ExtLangUtils {
 			$value = 'en';
 		}
 
-		$lang = $parser->getTitle()->langUtilsPageLang;
+		$lang = ExtLangUtils::$langMap[$parser->getTitle()];
 
 		$true = isset( $args[1] ) ? $args[1] : '';
 		$false = isset( $args[2] ) ? $args[2] : '';
@@ -624,7 +633,7 @@ class ExtLangUtils {
 		if ( $forceLang == '' || $forceLang == null ) {
 			# $forceLang itself will always be given a value, but if it is empty / null,
 			# assume that no language is being forced and just use the page lang.
-			$lang = $parser->getTitle()->langUtilsPageLang;
+			$lang = ExtLangUtils::$langMap[$parser->getTitle()];
 		}
 		else {
 			$lang = $forceLang;
@@ -657,11 +666,11 @@ class ExtLangUtils {
 
 	}
 
-	## Change language to mPageLang if the user is anonymous.
+	## Change language if the user is anonymous.
 	public static function changePageLang( $title, &$pageLang, $wgLang ) {
 		ExtLangUtils::setLang( $title, true );
 		if ( RequestContext::getMain()->getUser()->isAnon() ) {
-			$lang = $title->langUtilsPageLang;
+			$lang = ExtLangUtils::$langMap[$title];
 			if ( $lang !== 'en' ) {
 				$pageLang = Language::factory($lang);
 			}
@@ -744,7 +753,8 @@ class ExtLangUtils {
 
 			# Save the page language for the <body> function, or other skin
 			# functions that may need it later.
-			$skin->sPageLang = $pageLang;
+			ExtLangUtils::initLangMap();
+			ExtLangUtils::$langMap[$skin] = $pageLang;
 
 			# Start building the list of links.
 			$output = [
@@ -787,12 +797,13 @@ class ExtLangUtils {
 	}
 	public static function skinAddBodyClass( $out, $skin, &$bodyAttrs ) {
 
-		if ( isset( $skin->sPageLang ) ) {
-			$pageLang = $skin->sPageLang;
+		ExtLangUtils::initLangMap();
+		if ( !empty( ExtLangUtils::$langMap[$skin] ) ) {
+			$pageLang = ExtLangUtils::$langMap[$skin];
 		}
 		else {
 			$pageLang = ExtLangUtils::getLang( $skin->getTitle()->getText(), $skin->getTitle()->getNamespace() );
-			$skin->sPageLang = $pageLang;
+			ExtLangUtils::$langMap[$skin] = $pageLang;
 		}
 		$bodyAttrs['class'] .= ' pagelang-' . $pageLang;
 
