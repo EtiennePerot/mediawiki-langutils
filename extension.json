@@ -18,7 +18,8 @@
         "GetMagicVariableIDs": "ExtLangUtils::MagicWordwgVariableIDs",
         "SkinBuildSidebar": "ExtLangUtils::skinAddSidebar",
         "OutputPageBodyAttributes": "ExtLangUtils::skinAddBodyClass",
-        "PageContentLanguage": "ExtLangUtils::changePageLang"
+        "PageContentLanguage": "ExtLangUtils::changePageLang",
+        "MediaWikiServices": "ExtLangUtils::onMediaWikiServices"
     },
     "AutoloadClasses": {
         "ExtLangUtils": "LangUtils.php"

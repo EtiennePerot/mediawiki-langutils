@@ -13,6 +13,7 @@
 if ( !defined( 'MEDIAWIKI' ) ) { die( 'This file is a MediaWiki extension, it is not a valid entry point' ); }
 
 class ExtLangUtils {
+
 	# Copied straight from https://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/languages/Names.php?revision=113600
 	# Further versions have sometimes-lowercase language names, and ucwords() only works on ASCII characters.
 	public static $coreLanguageNames_titlecase = array(
@@ -444,6 +445,14 @@ class ExtLangUtils {
 		}
 	}
 
+	private static $mediawikiServices = null;
+
+	public static function onMediaWikiServices( MediaWiki\MediaWikiServices $services ) {
+		if (is_null(ExtLangUtils::$mediawikiServices)) {
+			ExtLangUtils::$mediawikiServices = $services;
+		}
+	}
+
 	public static function onParserFirstCallInit( Parser $parser ) {
 		$parser->setFunctionHook( 'languagetitle', [ self::class, 'languagetitle' ], SFH_OBJECT_ARGS );
 		$parser->setFunctionHook( 'langswitch', [ self::class, 'langswitch' ], SFH_OBJECT_ARGS );
@@ -668,11 +677,19 @@ class ExtLangUtils {
 
 	## Change language if the user is anonymous.
 	public static function changePageLang( $title, &$pageLang, $wgLang ) {
+
 		ExtLangUtils::setLang( $title, true );
 		if ( RequestContext::getMain()->getUser()->isAnon() ) {
 			$lang = ExtLangUtils::$langMap[$title];
 			if ( $lang !== 'en' ) {
-				$pageLang = Language::factory($lang);
+				if (function_exists(__NAMESPACE__ . '\\Language\\factory')) {
+					$pageLang = Language::factory($lang);
+				} else {
+					if (is_null(ExtLangUtils::$mediawikiServices)) {
+						die('Mediawiki services not initialized');
+					}
+					$pageLang = ExtLangUtils::$mediawikiServices->getLanguageFactory()->getLanguage($lang);
+				}
 			}
 		}
 		return true;
