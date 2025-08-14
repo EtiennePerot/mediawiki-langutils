@@ -12,6 +12,8 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) { die( 'This file is a MediaWiki extension, it is not a valid entry point' ); }
 
+use MediaWiki\Title\Title;
+
 class ExtLangUtils {
 
 	# Copied straight from https://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/languages/Names.php?revision=113600
